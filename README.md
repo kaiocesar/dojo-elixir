@@ -10,5 +10,5 @@ Dojo de Elixir - Primeiros passos
 - run `docker-compose up`
 
 #### Test
-
+run on terminal: `docker-compose run web mix test`
 
