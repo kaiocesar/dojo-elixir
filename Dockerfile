@@ -1,31 +1,21 @@
-FROM hexpm/elixir:1.10.1-erlang-22.2.4-alpine-3.11.3 AS otp-builder
+FROM elixir:1.10
 
-ARG APP_NAME
-ARG APP_VERSION
+WORKDIR /app
 
-ENV APP_NAME=${APP_NAME}
-    APP_VERSION=${APP_VERSION} \
-    MIX_ENV=prod
+RUN apt-get update && \
+    apt-get install --yes build-essential inotify-tools postgresql-client
 
+RUN mix local.hex --force
+RUN mix local.rebar --force
+RUN mix archive.install --force https://github.com/phoenixframework/archives/raw/master/phx_new.ez
 
-WORKDIR /build
+RUN curl -sL https://deb.nodesource.com/setup_12.x -o nodesource_setup.sh
 
-RUN apk update --no-cache && \
-    apk upgrade --no-cache && \
-    apk add --no-cache git
+RUN bash nodesource_setup.sh
 
-RUN mix local.rebar --force && \
-    mix local.hex --force
+RUN apt-get install nodejs
 
-
-COPY mix.* ./
-
-RUN mix deps.get --only prod && \
-    mix deps.compile
-
-COPY . .
-
-CMD["start"]
+EXPOSE 4000
 
 
 
